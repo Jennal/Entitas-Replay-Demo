@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Entitas;
 
 public class ReplaySystem : ReactiveSystem<GameEntity>
@@ -12,6 +13,8 @@ public class ReplaySystem : ReactiveSystem<GameEntity>
 
     protected override void Execute(List<GameEntity> entities)
     {
+        if (!_context.hasElixirHistory) return;
+
         var logicSystems = _context.logicSystem.systems;
         logicSystems.Initialize();
 //        var actions = _context.hasConsumptionHistory ? _context.consumptionHistory.entries : new List<ConsumptionEntity>();
@@ -27,15 +30,20 @@ public class ReplaySystem : ReactiveSystem<GameEntity>
 //            logicSystems.Execute();
 //        }
 
+        var targetEntry = _context.elixirHistory.entries.FirstOrDefault();
         foreach (var entry in _context.elixirHistory.entries)
         {
-            if (entry.tick > _context.jumpInTime.targetTick) return;
-            
-            _context.ReplaceTick(entry.tick);
-            _context.ReplaceElixir(entry.elixir);
-            
-            logicSystems.Execute();
+            if (entry.tick > _context.jumpInTime.targetTick) break;
+
+            targetEntry = entry;
         }
+
+        if (targetEntry == null) return;
+
+        _context.ReplaceTick(targetEntry.tick);
+        _context.ReplaceElixir(targetEntry.elixir);
+
+        logicSystems.Execute();
     }
 
     protected override bool Filter(GameEntity entity)
