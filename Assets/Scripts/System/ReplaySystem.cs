@@ -14,16 +14,26 @@ public class ReplaySystem : ReactiveSystem<GameEntity>
     {
         var logicSystems = _context.logicSystem.systems;
         logicSystems.Initialize();
-        var actions = _context.hasConsumptionHistory ? _context.consumptionHistory.entries : new List<ConsumptionEntity>();
-        var actionIndex = 0;
-        for (int tick = 0; tick <= _context.jumpInTime.targetTick; tick++)
+//        var actions = _context.hasConsumptionHistory ? _context.consumptionHistory.entries : new List<ConsumptionEntity>();
+//        var actionIndex = 0;
+//        for (int tick = 0; tick <= _context.jumpInTime.targetTick; tick++)
+//        {
+//            _context.ReplaceTick(tick);
+//            if (actions.Count > actionIndex && actions[actionIndex].tick == tick)
+//            {
+//                _context.CreateEntity().AddConsumeElixir(actions[actionIndex].amount);
+//                actionIndex++;
+//            }
+//            logicSystems.Execute();
+//        }
+
+        foreach (var entry in _context.elixirHistory.entries)
         {
-            _context.ReplaceTick(tick);
-            if (actions.Count > actionIndex && actions[actionIndex].tick == tick)
-            {
-                _context.CreateEntity().AddConsumeElixir(actions[actionIndex].amount);
-                actionIndex++;
-            }
+            if (entry.tick > _context.jumpInTime.targetTick) return;
+            
+            _context.ReplaceTick(entry.tick);
+            _context.ReplaceElixir(entry.elixir);
+            
             logicSystems.Execute();
         }
     }

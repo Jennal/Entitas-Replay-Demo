@@ -6,6 +6,7 @@
 // <time> #CREATETIME# </time>
 //-----------------------------------------------------------------------
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -52,6 +53,7 @@ public class GameController : MonoBehaviour {
             .Add(new NotifyPauseListenersSystem(contexts))
             .Add(new ReplaySystem(contexts))
             .Add(new CleanupConsumtionHistorySystem(contexts))
+            .Add(new ElixirHistorySystem(contexts))
             ;
     }
 
